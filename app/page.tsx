@@ -16,49 +16,52 @@ export default function Dashboard() {
   }, [])
 
   const modulos = [
-    { nome: 'Vendas (PDV)', rota: '/pdv', icon: '🛒', cor: 'bg-blue-600' },
-    { nome: 'Estoque', rota: '/cadastro', icon: '📦', cor: 'bg-orange-600' },
-    { nome: 'Clientes', rota: '/clientes', icon: '👥', cor: 'bg-emerald-600' },
-    { nome: 'Fornecedores', rota: '/fornecedores', icon: '🚛', cor: 'bg-purple-600' },
-    { nome: 'Financeiro', rota: '/financeiro', icon: '💰', cor: 'bg-red-600' },
-    { nome: 'Relatórios', rota: '/relatorios', icon: '📊', cor: 'bg-zinc-700' },
+    { nome: 'Vendas (PDV)', rota: '/pdv', icon: '🛒', cor: '#2563eb' },
+    { nome: 'Estoque', rota: '/cadastro', icon: '📦', cor: '#ea580c' },
+    { nome: 'Clientes', rota: '/clientes', icon: '👥', cor: '#059669' },
+    { nome: 'Fornecedores', rota: '/fornecedores', icon: '🚛', cor: '#9333ea' },
+    { nome: 'Financeiro', rota: '/financeiro', icon: '💰', cor: '#dc2626' },
+    { nome: 'Relatórios', rota: '/relatorios', icon: '📊', cor: '#4b5563' },
   ]
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white p-4 md:p-8 font-sans">
+    <main className="gsa-dashboard">
       
-      <header className="flex justify-between items-center mb-10 p-6 rounded-[2rem] border border-zinc-800 bg-[#0f0f0f] shadow-2xl">
+      <header className="gsa-header">
         <div>
-          <h1 className="text-3xl font-black italic uppercase tracking-tighter text-blue-500">GSA GESTÃO</h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Dashboard Administrativo</p>
+          <h1 style={{color: '#3b82f6', fontSize: '32px', fontWeight: '900', fontStyle: 'italic', textTransform: 'uppercase', letterSpacing: '-1px'}}>GSA GESTÃO</h1>
+          <p style={{fontSize: '10px', fontWeight: 'bold', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '3px'}}>Painel Administrativo</p>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="p-10 rounded-[3rem] border border-zinc-800 bg-[#0f0f0f] shadow-xl">
-          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest">Faturamento Hoje</p>
-          <h2 className="text-5xl font-black text-green-500">R$ 0,00</h2>
+      <div className="gsa-grid-stats">
+        <div className="gsa-card-stat">
+          <p style={{opacity: 0.4, fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', marginBottom: '10px'}}>Faturamento Hoje</p>
+          <h2 style={{fontSize: '48px', fontWeight: '900', color: '#22c55e'}}>R$ 0,00</h2>
         </div>
-        <div className="p-10 rounded-[3rem] border border-zinc-800 bg-[#0f0f0f] shadow-xl">
-          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest">Produtos</p>
-          <h2 className="text-5xl font-black text-blue-500">{stats.produtos}</h2>
+        
+        <div className="gsa-card-stat">
+          <p style={{opacity: 0.4, fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', marginBottom: '10px'}}>Produtos / Serviços</p>
+          <h2 style={{fontSize: '48px', fontWeight: '900', color: '#3b82f6'}}>{stats.produtos}</h2>
         </div>
-        <div className="p-10 rounded-[3rem] border border-zinc-800 bg-[#0f0f0f] shadow-xl">
-          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest">Alertas</p>
-          <h2 className="text-5xl font-black text-orange-500">{stats.critico}</h2>
+
+        <div className="gsa-card-stat">
+          <p style={{opacity: 0.4, fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', marginBottom: '10px'}}>Estoque Crítico</p>
+          <h2 style={{fontSize: '48px', fontWeight: '900', color: '#f97316'}}>{stats.critico}</h2>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+      <div className="gsa-grid-modulos">
         {modulos.map((m) => (
-          <Link key={m.nome} href={m.rota} className="flex flex-col items-center group">
-            <div className={`${m.cor} w-full h-32 rounded-[2.5rem] flex items-center justify-center text-4xl mb-4 shadow-2xl transition-transform group-hover:scale-105 text-white`}>
+          <Link key={m.nome} href={m.rota} className="gsa-btn-modulo">
+            <div className="gsa-icon-box" style={{backgroundColor: m.cor}}>
               {m.icon}
             </div>
-            <p className="font-black text-[10px] uppercase opacity-70">{m.nome}</p>
+            <p style={{fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', opacity: 0.6}}>{m.nome}</p>
           </Link>
         ))}
       </div>
+
     </main>
   )
 }

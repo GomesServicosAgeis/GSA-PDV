@@ -1,11 +1,79 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* app/globals.css */
+/* Removemos as chamadas @tailwind que estavam quebrando tudo */
 
-/* Reset para garantir o fundo preto GSA */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   background-color: #050505;
   color: #ffffff;
-  margin: 0;
-  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+}
+
+/* Classes de layout fixas (Sem depender de Tailwind) */
+.gsa-dashboard {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gsa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0f0f0f;
+  padding: 30px;
+  border-radius: 30px;
+  border: 1px solid #1f2937;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.gsa-grid-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.gsa-card-stat {
+  background-color: #0f0f0f;
+  padding: 40px;
+  border-radius: 40px;
+  border: 1px solid #1f2937;
+}
+
+.gsa-grid-modulos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 25px;
+}
+
+.gsa-btn-modulo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.gsa-btn-modulo:hover {
+  transform: scale(1.05);
+}
+
+.gsa-icon-box {
+  width: 100%;
+  height: 120px;
+  border-radius: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 45px;
+  margin-bottom: 10px;
+  box-shadow: 0 15px 25px rgba(0,0,0,0.3);
 }
