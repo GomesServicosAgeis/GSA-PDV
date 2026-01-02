@@ -1,5 +1,4 @@
 /* app/globals.css */
-/* Removemos as chamadas @tailwind que estavam quebrando tudo */
 
 * {
   margin: 0;
@@ -8,13 +7,12 @@
 }
 
 body {
-  background-color: #050505;
-  color: #ffffff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #050505 !important;
+  color: #ffffff !important;
+  font-family: Arial, sans-serif;
   min-height: 100vh;
 }
 
-/* Classes de layout fixas (Sem depender de Tailwind) */
 .gsa-dashboard {
   padding: 40px;
   max-width: 1200px;
@@ -30,12 +28,11 @@ body {
   border-radius: 30px;
   border: 1px solid #1f2937;
   margin-bottom: 40px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .gsa-grid-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 50px;
 }
@@ -49,31 +46,25 @@ body {
 
 .gsa-grid-modulos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
 }
 
-.gsa-btn-modulo {
+.gsa-modulo {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-decoration: none;
   color: white;
-  transition: transform 0.2s;
 }
 
-.gsa-btn-modulo:hover {
-  transform: scale(1.05);
-}
-
-.gsa-icon-box {
+.gsa-box {
   width: 100%;
   height: 120px;
-  border-radius: 35px;
+  border-radius: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 45px;
+  font-size: 40px;
   margin-bottom: 10px;
-  box-shadow: 0 15px 25px rgba(0,0,0,0.3);
 }
