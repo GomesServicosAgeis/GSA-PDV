@@ -17,11 +17,15 @@ export default function Dashboard() {
 
     async function carregarDados() {
       try {
-        const { count: p } = await supabase.from('produtos').select('*', { count: 'exact', head: true })
-        const { count: c } = await supabase.from('produtos').select('*', { count: 'exact', head: true }).lte('estoque_atual', 5)
-        setStats(prev => ({ ...prev, produtos: p || 0, critico: c || 0 }))
-      } catch (err) {
-        console.error("Erro ao carregar dados GSA:", err)
+        const hoje = new Date().toISOString().split('T')[0]
+        const { data: v } = await supabase.from('vendas').select('total_venda').gte('data_venda', `${hoje}T00:00:00`)
+        const faturamentoTotal = v?.reduce((acc, curr) => acc + Number(curr.total_venda), 0) || 0
+        const { count: totalP } = await supabase.from('produtos').select('*', { count: 'exact', head: true })
+        const { count: totalC } = await supabase.from('produtos').select('*', { count: 'exact', head: true }).lte('estoque_atual', 5)
+
+        setStats({ faturamento: faturamentoTotal, produtos: totalP || 0, critico: totalC || 0 })
+      } catch (error) {
+        console.error("Erro KPIs:", error)
       } finally {
         setLoading(false)
       }
@@ -29,78 +33,59 @@ export default function Dashboard() {
     carregarDados()
   }, [])
 
+  const toggleTema = () => {
+    const novoTema = tema === 'dark' ? 'light' : 'dark'
+    setTema(novoTema)
+    localStorage.setItem('gsa-theme', novoTema)
+    document.documentElement.setAttribute('data-theme', novoTema)
+  }
+
   const modulos = [
-    { nome: 'Vendas (PDV)', rota: '/pdv', icon: '🛒', cor: '#2563eb' },
-    { nome: 'Estoque', rota: '/cadastro', icon: '📦', cor: '#ea580c' },
-    { nome: 'Clientes', rota: '/clientes', icon: '👥', cor: '#059669' },
-    { nome: 'Fornecedores', rota: '/fornecedores', icon: '🚛', cor: '#9333ea' },
-    { nome: 'Financeiro', rota: '/financeiro', icon: '💰', cor: '#dc2626' },
-    { nome: 'Relatórios', rota: '/relatorios', icon: '📊', cor: '#4b5563' },
+    { nome: 'Vendas (PDV)', rota: '/pdv', icon: '🛒', cor: 'bg-blue-600' },
+    { nome: 'Estoque', rota: '/cadastro', icon: '📦', cor: 'bg-orange-600' },
+    { nome: 'Clientes', rota: '/clientes', icon: '👥', cor: 'bg-emerald-600' },
+    { nome: 'Fornecedores', rota: '/fornecedores', icon: '🚛', cor: 'bg-purple-600' },
+    { nome: 'Financeiro', rota: '/financeiro', icon: '💰', cor: 'bg-red-600' },
+    { nome: 'Relatórios', rota: '/relatorios', icon: '📊', cor: 'bg-zinc-700' },
   ]
 
-  // Estilos de Segurança (Inline) para garantir que o layout nunca quebre
-  const mainStyle: React.CSSProperties = {
-    backgroundColor: tema === 'dark' ? '#050505' : '#f3f4f6',
-    color: tema === 'dark' ? '#ffffff' : '#111827',
-    minHeight: '100vh',
-    padding: '32px',
-    transition: 'all 0.3s ease'
-  }
-
-  const cardStyle: React.CSSProperties = {
-    backgroundColor: tema === 'dark' ? '#0f0f0f' : '#ffffff',
-    border: `1px solid ${tema === 'dark' ? '#1f2937' : '#e5e7eb'}`,
-    borderRadius: '24px',
-    padding: '24px',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-  }
-
-  if (loading) return <div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#050505', color: '#3b82f6', fontWeight: '900'}}>GSA GESTÃO...</div>
+  if (loading) return <div className="h-screen flex items-center justify-center bg-[#050505] text-blue-500 font-black italic animate-pulse">GSA GESTÃO...</div>
 
   return (
-    <main style={mainStyle}>
-      <header style={{...cardStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px'}}>
+    <main className={`min-h-screen p-4 md:p-8 transition-colors duration-300 ${tema === 'dark' ? 'bg-[#050505] text-white' : 'bg-gray-100 text-gray-900'}`}>
+      
+      <header className={`flex justify-between items-center mb-10 p-6 rounded-[2.5rem] border shadow-2xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
         <div>
-          <h1 style={{fontSize: '24px', fontWeight: '900', fontStyle: 'italic', color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '-1px'}}>GSA GESTÃO</h1>
-          <p style={{fontSize: '10px', fontWeight: 'bold', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '2px'}}>Dashboard Administrativo</p>
+          <h1 className="text-3xl font-black italic tracking-tighter uppercase text-blue-500">GSA GESTÃO</h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Dashboard Administrativo</p>
         </div>
-        <button 
-          onClick={() => {
-            const nt = tema === 'dark' ? 'light' : 'dark'
-            setTema(nt)
-            localStorage.setItem('gsa-theme', nt)
-            document.documentElement.setAttribute('data-theme', nt)
-          }}
-          style={{cursor: 'pointer', padding: '10px 20px', borderRadius: '12px', border: '1px solid #3b82f640', background: '#3b82f610', color: '#3b82f6', fontWeight: 'bold'}}
-        >
-          {tema === 'dark' ? '☀️ CLARO' : '🌙 ESCURO'}
+        <button onClick={toggleTema} className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 active:scale-90 transition-all">
+          {tema === 'dark' ? '☀️' : '🌙'}
         </button>
       </header>
 
-      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '40px'}}>
-        <div style={cardStyle}>
-          <p style={{fontSize: '10px', fontWeight: '900', opacity: 0.4, textTransform: 'uppercase', marginBottom: '8px'}}>Faturamento Hoje</p>
-          <h2 style={{fontSize: '40px', fontWeight: '900', color: '#22c55e'}}>R$ {stats.faturamento.toFixed(2)}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className={`p-10 rounded-[3rem] border shadow-xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
+          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest italic">Faturamento Hoje</p>
+          <h2 className="text-5xl font-black tracking-tighter text-green-500">R$ {stats.faturamento.toFixed(2)}</h2>
         </div>
-        <div style={cardStyle}>
-          <p style={{fontSize: '10px', fontWeight: '900', opacity: 0.4, textTransform: 'uppercase', marginBottom: '8px'}}>Produtos Cadastrados</p>
-          <h2 style={{fontSize: '40px', fontWeight: '900', color: '#3b82f6'}}>{stats.produtos} <span style={{fontSize: '14px', opacity: 0.3}}>ITENS</span></h2>
+        <div className={`p-10 rounded-[3rem] border shadow-xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
+          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest italic">Produtos / Serviços</p>
+          <h2 className="text-5xl font-black tracking-tighter text-blue-500">{stats.produtos} <span className="text-lg opacity-30">ITENS</span></h2>
         </div>
-        <div style={cardStyle}>
-          <p style={{fontSize: '10px', fontWeight: '900', opacity: 0.4, textTransform: 'uppercase', marginBottom: '8px'}}>Estoque Crítico</p>
-          <h2 style={{fontSize: '40px', fontWeight: '900', color: '#f97316'}}>{stats.critico} <span style={{fontSize: '14px', opacity: 0.3}}>ALERTAS</span></h2>
+        <div className={`p-10 rounded-[3rem] border shadow-xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
+          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest italic">Estoque Crítico</p>
+          <h2 className="text-5xl font-black tracking-tighter text-orange-500">{stats.critico} <span className="text-lg opacity-30">ALERTAS</span></h2>
         </div>
       </div>
 
-      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '20px'}}>
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
         {modulos.map((m) => (
-          <Link key={m.nome} href={m.rota} style={{textDecoration: 'none', color: 'inherit'}}>
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-              <div style={{backgroundColor: m.cor, width: '100%', height: '110px', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', marginBottom: '10px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.3)'}}>
-                {m.icon}
-              </div>
-              <p style={{fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', opacity: 0.6}}>{m.nome}</p>
+          <Link key={m.nome} href={m.rota} className="group flex flex-col items-center">
+            <div className={`${m.cor} w-full h-32 rounded-[2.5rem] flex items-center justify-center text-4xl mb-4 shadow-2xl transition-all group-hover:scale-105 group-hover:-rotate-2 text-white`}>
+              {m.icon}
             </div>
+            <p className="text-center font-black text-[10px] uppercase tracking-tighter opacity-70 group-hover:text-blue-500 transition-colors">{m.nome}</p>
           </Link>
         ))}
       </div>

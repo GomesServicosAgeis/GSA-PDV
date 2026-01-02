@@ -1,4 +1,3 @@
-/* Importação direta para evitar erro de 'Unknown At-Rule' */
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
@@ -14,10 +13,10 @@
 }
 
 body {
-  background-color: var(--background);
   color: var(--foreground);
+  background: var(--background);
+  transition: background 0.3s ease, color 0.3s ease;
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  font-family: sans-serif;
 }
