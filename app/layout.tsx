@@ -1,11 +1,6 @@
 import './globals.css'
 import { AuthProvider } from '@/lib/auth-context'
 
-export const metadata = {
-  title: 'GSA GESTÃO',
-  description: 'Sistema de Gestão Ágil',
-}
-
 export default function RootLayout({
   children,
 }: {
@@ -13,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
-      <body>
+      <body className="antialiased">
         <AuthProvider>
           {children}
         </AuthProvider>
