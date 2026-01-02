@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(currentUser)
 
       if (currentUser) {
+        // Se está logado, busca o perfil para checar a trava
         const { data: perfilData } = await supabase
           .from('perfis')
           .select('*')
@@ -29,19 +30,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         setPerfil(perfilData)
 
-        // Lógica de Trava GSA
         const hoje = new Date()
         const expiracao = perfilData?.data_expiracao ? new Date(perfilData.data_expiracao) : null
         const isExpired = expiracao && expiracao < hoje
         const isAdmin = currentUser.email === ADMIN_EMAIL
 
-        // Se não for ADM e estiver expirado, manda para bloqueio
+        // Trava de mensalidade: se expirou e não é ADM, bloqueia
         if (!isAdmin && isExpired && pathname !== '/bloqueado') {
           router.push('/bloqueado')
         }
       } else {
-        // Se não estiver logado e tentar acessar área restrita, manda para login
-        if (pathname !== '/login' && pathname !== '/cadastro-usuario') {
+        // Se NÃO está logado, só pode ver as rotas públicas abaixo
+        const rotasPublicas = ['/login', '/registrar', '/cadastro-usuario', '/bloqueado']
+        
+        if (!rotasPublicas.includes(pathname)) {
           router.push('/login')
         }
       }
@@ -50,9 +52,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkUser()
 
+    // Listener para mudanças de estado (login/logout)
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null)
-      if (event === 'SIGNED_OUT') router.push('/login')
+      if (event === 'SIGNED_OUT') {
+        router.push('/login')
+      }
     })
 
     return () => {
@@ -62,7 +67,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, perfil, loading }}>
-      {!loading ? children : <div className="h-screen bg-gray-950 flex items-center justify-center text-blue-500 font-bold">Iniciando GSA PDV...</div>}
+      {!loading ? (
+        children
+      ) : (
+        <div className="h-screen bg-gray-950 flex items-center justify-center text-blue-500 font-black italic animate-pulse">
+          CARREGANDO GSA PDV...
+        </div>
+      )}
     </AuthContext.Provider>
   )
 }
