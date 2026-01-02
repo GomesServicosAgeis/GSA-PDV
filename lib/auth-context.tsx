@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
   const pathname = usePathname()
 
+  // Seu e-mail de administrador com acesso ilimitado
   const ADMIN_EMAIL = 'gomesservicosageis@gmail.com'
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(currentUser)
 
       if (currentUser) {
-        // Se está logado, busca o perfil para checar a trava
+        // Busca os dados do perfil no banco de dados
         const { data: perfilData } = await supabase
           .from('perfis')
           .select('*')
@@ -30,17 +31,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         setPerfil(perfilData)
 
+        // Lógica da trava SaaS
         const hoje = new Date()
         const expiracao = perfilData?.data_expiracao ? new Date(perfilData.data_expiracao) : null
         const isExpired = expiracao && expiracao < hoje
         const isAdmin = currentUser.email === ADMIN_EMAIL
 
-        // Trava de mensalidade: se expirou e não é ADM, bloqueia
+        // 1. Se o lojista expirou e não é você (ADM), bloqueia o acesso
         if (!isAdmin && isExpired && pathname !== '/bloqueado') {
           router.push('/bloqueado')
+          setLoading(false)
+          return
         }
+
+        // 2. Se ele estiver logado e tentar acessar login ou registrar, manda para o Dashboard (/)
+        if (pathname === '/login' || pathname === '/registrar') {
+          router.push('/')
+        }
+
       } else {
-        // Se NÃO está logado, só pode ver as rotas públicas abaixo
+        // 3. Se NÃO está logado, só permite rotas públicas
         const rotasPublicas = ['/login', '/registrar', '/cadastro-usuario', '/bloqueado']
         
         if (!rotasPublicas.includes(pathname)) {
@@ -52,9 +62,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkUser()
 
-    // Listener para mudanças de estado (login/logout)
+    // Listener para mudanças de autenticação em tempo real
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null)
+      const newUser = session?.user || null
+      setUser(newUser)
+      
+      if (event === 'SIGNED_IN') {
+        router.push('/') // Garante que ao logar ele vá para o Dashboard
+      }
+      
       if (event === 'SIGNED_OUT') {
         router.push('/login')
       }
@@ -70,8 +86,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       {!loading ? (
         children
       ) : (
-        <div className="h-screen bg-gray-950 flex items-center justify-center text-blue-500 font-black italic animate-pulse">
-          CARREGANDO GSA PDV...
+        <div className="h-screen bg-gray-950 flex flex-col items-center justify-center gap-4">
+          <div className="text-blue-500 font-black italic animate-pulse text-2xl uppercase tracking-tighter">
+            GSA GESTÃO
+          </div>
+          <div className="w-48 h-1 bg-gray-900 rounded-full overflow-hidden">
+            <div className="h-full bg-blue-600 animate-[loading_2s_infinite]"></div>
+          </div>
+          <style jsx>{`
+            @keyframes loading {
+              0% { transform: translateX(-100%); }
+              100% { transform: translateX(100%); }
+            }
+          `}</style>
         </div>
       )}
     </AuthContext.Provider>
