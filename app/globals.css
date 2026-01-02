@@ -2,22 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Configuração de Cores GSA */
 :root {
-  --background: #f3f4f6; /* cinza claro */
-  --foreground: #111827; /* texto escuro */
-  --card: #ffffff;
-  --border: #e5e7eb;
+  --background: 255 255 255; /* Branco */
+  --foreground: 10 10 10;    /* Preto */
+  --card: 243 244 246;       /* Cinza claro para cards */
+  --border: 229 231 235;    /* Borda clara */
 }
 
 [data-theme='dark'] {
-  --background: #050505; /* pure black GSA */
-  --foreground: #ffffff;
-  --card: #111827; /* cinza muito escuro */
-  --border: #1f2937;
+  --background: 5 5 5;       /* Pure Black GSA */
+  --foreground: 255 255 255; /* Branco */
+  --card: 15 15 15;          /* Cinza quase preto para cards */
+  --border: 31 41 55;        /* Borda escura */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  transition: background 0.3s ease, color 0.3s ease;
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* Utilitários extras para facilitar o layout */
+.gsa-card {
+  background-color: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
 }
