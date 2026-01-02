@@ -38,7 +38,7 @@ export default function Dashboard() {
     { nome: 'Relatórios', rota: '/relatorios', icon: '📊', cor: '#4b5563' },
   ]
 
-  // Estilos de segurança (Fallback)
+  // Estilos de Segurança (Inline) para garantir que o layout nunca quebre
   const mainStyle: React.CSSProperties = {
     backgroundColor: tema === 'dark' ? '#050505' : '#f3f4f6',
     color: tema === 'dark' ? '#ffffff' : '#111827',
@@ -58,11 +58,11 @@ export default function Dashboard() {
   if (loading) return <div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#050505', color: '#3b82f6', fontWeight: '900'}}>GSA GESTÃO...</div>
 
   return (
-    <main style={mainStyle} className="gsa-main">
+    <main style={mainStyle}>
       <header style={{...cardStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px'}}>
         <div>
           <h1 style={{fontSize: '24px', fontWeight: '900', fontStyle: 'italic', color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '-1px'}}>GSA GESTÃO</h1>
-          <p style={{fontSize: '10px', fontWeight: 'bold', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '2px'}}>Painel de Controle</p>
+          <p style={{fontSize: '10px', fontWeight: 'bold', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '2px'}}>Dashboard Administrativo</p>
         </div>
         <button 
           onClick={() => {
