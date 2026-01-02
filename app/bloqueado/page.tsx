@@ -1,17 +1,15 @@
 'use client'
-export default function Bloqueado() {
+import Link from 'next/link'
+
+export default function EmDesenvolvimento() {
   return (
-    <main className="h-screen flex flex-col items-center justify-center bg-gray-950 text-white p-6">
-      <div className="bg-red-900/20 p-10 rounded-[3rem] border border-red-500/30 text-center max-w-lg">
-        <span className="text-6xl mb-6 block">🔒</span>
-        <h1 className="text-3xl font-black mb-4">ASSINATURA EXPIRADA</h1>
-        <p className="text-gray-400 font-bold mb-8">
-          Sua licença do GSA PDV venceu. Para continuar operando seu negócio com agilidade, entre em contato com o suporte.
-        </p>
-        <button className="bg-white text-black px-10 py-4 rounded-2xl font-black hover:bg-gray-200 transition-all">
-          RENOVAR VIA WHATSAPP
-        </button>
-      </div>
+    <main className="h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-6">
+      <div className="w-20 h-20 bg-blue-600/20 rounded-full flex items-center justify-center text-4xl mb-6 animate-pulse">🛠️</div>
+      <h1 className="text-2xl font-black italic uppercase text-blue-500 mb-2">Módulo em Desenvolvimento</h1>
+      <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-8">Gomes Serviços Ágeis - GSA</p>
+      <Link href="/" className="bg-white text-black px-8 py-3 rounded-xl font-black uppercase text-xs hover:bg-gray-200 transition-all">
+        Voltar ao Dashboard
+      </Link>
     </main>
   )
 }
