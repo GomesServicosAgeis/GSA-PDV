@@ -1,44 +1,19 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 import Link from 'next/link'
 
 export default function Dashboard() {
-  const { user } = useAuth()
-  const [tema, setTema] = useState('dark')
-  const [stats, setStats] = useState({ faturamento: 0, produtos: 0, critico: 0 })
-  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState({ produtos: 0, critico: 0 })
 
   useEffect(() => {
-    const temaSalvo = localStorage.getItem('gsa-theme') || 'dark'
-    setTema(temaSalvo)
-    document.documentElement.setAttribute('data-theme', temaSalvo)
-
     async function carregarDados() {
-      try {
-        const hoje = new Date().toISOString().split('T')[0]
-        const { data: v } = await supabase.from('vendas').select('total_venda').gte('data_venda', `${hoje}T00:00:00`)
-        const faturamentoTotal = v?.reduce((acc, curr) => acc + Number(curr.total_venda), 0) || 0
-        const { count: totalP } = await supabase.from('produtos').select('*', { count: 'exact', head: true })
-        const { count: totalC } = await supabase.from('produtos').select('*', { count: 'exact', head: true }).lte('estoque_atual', 5)
-
-        setStats({ faturamento: faturamentoTotal, produtos: totalP || 0, critico: totalC || 0 })
-      } catch (error) {
-        console.error("Erro KPIs:", error)
-      } finally {
-        setLoading(false)
-      }
+      const { count: p } = await supabase.from('produtos').select('*', { count: 'exact', head: true })
+      const { count: c } = await supabase.from('produtos').select('*', { count: 'exact', head: true }).lte('estoque_atual', 5)
+      setStats({ produtos: p || 0, critico: c || 0 })
     }
     carregarDados()
   }, [])
-
-  const toggleTema = () => {
-    const novoTema = tema === 'dark' ? 'light' : 'dark'
-    setTema(novoTema)
-    localStorage.setItem('gsa-theme', novoTema)
-    document.documentElement.setAttribute('data-theme', novoTema)
-  }
 
   const modulos = [
     { nome: 'Vendas (PDV)', rota: '/pdv', icon: '🛒', cor: 'bg-blue-600' },
@@ -49,43 +24,38 @@ export default function Dashboard() {
     { nome: 'Relatórios', rota: '/relatorios', icon: '📊', cor: 'bg-zinc-700' },
   ]
 
-  if (loading) return <div className="h-screen flex items-center justify-center bg-[#050505] text-blue-500 font-black italic animate-pulse">GSA GESTÃO...</div>
-
   return (
-    <main className={`min-h-screen p-4 md:p-8 transition-colors duration-300 ${tema === 'dark' ? 'bg-[#050505] text-white' : 'bg-gray-100 text-gray-900'}`}>
+    <main className="min-h-screen bg-[#050505] text-white p-4 md:p-8 font-sans">
       
-      <header className={`flex justify-between items-center mb-10 p-6 rounded-[2.5rem] border shadow-2xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
+      <header className="flex justify-between items-center mb-10 p-6 rounded-[2rem] border border-zinc-800 bg-[#0f0f0f] shadow-2xl">
         <div>
-          <h1 className="text-3xl font-black italic tracking-tighter uppercase text-blue-500">GSA GESTÃO</h1>
+          <h1 className="text-3xl font-black italic uppercase tracking-tighter text-blue-500">GSA GESTÃO</h1>
           <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Dashboard Administrativo</p>
         </div>
-        <button onClick={toggleTema} className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 active:scale-90 transition-all">
-          {tema === 'dark' ? '☀️' : '🌙'}
-        </button>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className={`p-10 rounded-[3rem] border shadow-xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
-          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest italic">Faturamento Hoje</p>
-          <h2 className="text-5xl font-black tracking-tighter text-green-500">R$ {stats.faturamento.toFixed(2)}</h2>
+        <div className="p-10 rounded-[3rem] border border-zinc-800 bg-[#0f0f0f] shadow-xl">
+          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest">Faturamento Hoje</p>
+          <h2 className="text-5xl font-black text-green-500">R$ 0,00</h2>
         </div>
-        <div className={`p-10 rounded-[3rem] border shadow-xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
-          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest italic">Produtos / Serviços</p>
-          <h2 className="text-5xl font-black tracking-tighter text-blue-500">{stats.produtos} <span className="text-lg opacity-30">ITENS</span></h2>
+        <div className="p-10 rounded-[3rem] border border-zinc-800 bg-[#0f0f0f] shadow-xl">
+          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest">Produtos</p>
+          <h2 className="text-5xl font-black text-blue-500">{stats.produtos}</h2>
         </div>
-        <div className={`p-10 rounded-[3rem] border shadow-xl transition-all ${tema === 'dark' ? 'bg-[#0f0f0f] border-zinc-800' : 'bg-white border-gray-200'}`}>
-          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest italic">Estoque Crítico</p>
-          <h2 className="text-5xl font-black tracking-tighter text-orange-500">{stats.critico} <span className="text-lg opacity-30">ALERTAS</span></h2>
+        <div className="p-10 rounded-[3rem] border border-zinc-800 bg-[#0f0f0f] shadow-xl">
+          <p className="opacity-40 text-[10px] font-black uppercase mb-4 tracking-widest">Alertas</p>
+          <h2 className="text-5xl font-black text-orange-500">{stats.critico}</h2>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
         {modulos.map((m) => (
-          <Link key={m.nome} href={m.rota} className="group flex flex-col items-center">
-            <div className={`${m.cor} w-full h-32 rounded-[2.5rem] flex items-center justify-center text-4xl mb-4 shadow-2xl transition-all group-hover:scale-105 group-hover:-rotate-2 text-white`}>
+          <Link key={m.nome} href={m.rota} className="flex flex-col items-center group">
+            <div className={`${m.cor} w-full h-32 rounded-[2.5rem] flex items-center justify-center text-4xl mb-4 shadow-2xl transition-transform group-hover:scale-105 text-white`}>
               {m.icon}
             </div>
-            <p className="text-center font-black text-[10px] uppercase tracking-tighter opacity-70 group-hover:text-blue-500 transition-colors">{m.nome}</p>
+            <p className="font-black text-[10px] uppercase opacity-70">{m.nome}</p>
           </Link>
         ))}
       </div>
